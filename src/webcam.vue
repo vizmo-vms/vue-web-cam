@@ -48,6 +48,32 @@ export default {
       validator: value => {
         return value.height && value.width;
       }
+    },
+    /**
+     * camera facing mode
+     *  - user => front facing camera
+     *  - environment => back facing camera
+     *
+     * NOTE: If `deviceId` is provided, then library tries to open camera with that `deviceId`
+     *
+     * @default "user"
+     */
+    facingMode: {
+      type: String,
+      default: "user",
+      validator: value => {
+        return value == "user" || value == "environment";
+      }
+    },
+    /**
+     * if set to `false`, falls back to available camera if provided facing camera is not available.
+     * If set to `true`, throws error if provided facing camera is not available.
+     *
+     * @default false
+     */
+    exactFacingMode: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -199,9 +225,7 @@ export default {
 
     // start the video
     start() {
-      if (this.deviceId) {
-        this.loadCamera(this.deviceId);
-      }
+      this.loadCamera(this.deviceId);
     },
 
     // pause the video
@@ -222,13 +246,16 @@ export default {
      * test access
      */
     testMediaAccess() {
-      let constraints = { video: true };
+      let constraints = { video: { facingMode: this.facingMode } };
 
       if (this.resolution) {
         constraints.video = {};
         constraints.video.height = this.resolution.height;
         constraints.video.width = this.resolution.width;
       }
+
+      if (this.exactFacingMode)
+        constraints.video.facingMode = { exact: this.facingMode };
 
       navigator.mediaDevices
         .getUserMedia(constraints)
@@ -239,6 +266,7 @@ export default {
             track.stop();
           });
           this.loadCameras();
+          this.loadCamera();
         })
         .catch(error => this.$emit("error", error));
     },
@@ -247,7 +275,12 @@ export default {
      * load the camera passed as index!
      */
     loadCamera(device) {
-      let constraints = { video: { deviceId: { exact: device } } };
+      let constraints = { video: { facingMode: this.facingMode } };
+
+      if (this.exactFacingMode)
+        constraints.video.facingMode = { exact: this.facingMode };
+
+      if (device) constraints = { video: { deviceId: { exact: device } } };
 
       if (this.resolution) {
         constraints.video.height = this.resolution.height;

@@ -19,7 +19,9 @@
     "ecmaVersion": 2017,
     "sourceType": "module"
   },
-  "plugins": ["vue", "prettier"],
+  "plugins": [
+    "vue"
+  ],
   "rules": {
     "no-const-assign": "warn",
     "no-this-before-super": "warn",
@@ -32,7 +34,6 @@
     "import/no-unassigned-import": "warn",
     "semi": 0,
     "no-console": "off",
-    "prettier/prettier": "error",
     "vue/max-attributes-per-line": [
       2,
       {
