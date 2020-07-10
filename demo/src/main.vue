@@ -7,8 +7,9 @@
         <div class="border">
           <vue-web-cam
             ref="webcam"
-            :device-id="deviceId"
+
             width="100%"
+            facing-mode="environment"
             @started="onStarted"
             @stopped="onStopped"
             @error="onError"
